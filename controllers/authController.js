@@ -46,7 +46,7 @@ export const register = async (req, res) => {
     await user.save();
 
     // Send OTP email
-    await sendOTP(email, otpCode, name);
+    // await sendOTP(email, otpCode, name);
 
     res.status(201).json({
       message: 'Registration successful. OTP sent to your email.',
