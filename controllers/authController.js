@@ -144,9 +144,10 @@ export const login = async (req, res) => {
 export const logout = async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
-
+  console.log(token);
     if (token) {
-      await Session.findOneAndDelete({ token });
+      const a = await Session.findOneAndDelete({ token });
+      console.log(a);
     }
 
     res.json({ message: 'Logout successful' });
