@@ -143,11 +143,22 @@ export const login = async (req, res) => {
 // Logout
 export const logout = async (req, res) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
-  console.log(token.token);
+    // Extract the token from the Authorization header (Bearer <token>)
+    let token = req.headers.authorization?.split(' ')[1];
+
     if (token) {
-      const a = await Session.findOneAndDelete({ token });
-      console.log(a);
+      // FIX: Trim whitespace to ensure exact matching with the database
+      token = token.trim();
+      
+      console.log('Attempting to delete token:', token);
+
+      const deletedSession = await Session.findOneAndDelete({ token });
+      
+      if (!deletedSession) {
+        console.log('Warning: No session found with this token. Delete failed.');
+      } else {
+        console.log('Deleted Session:', deletedSession);
+      }
     }
 
     res.json({ message: 'Logout successful' });
