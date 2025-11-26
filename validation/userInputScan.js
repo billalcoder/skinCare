@@ -30,6 +30,8 @@ export const userRegistrationSchema = z.object({
     .min(13, "You must be at least 13 years old")
     .max(120, "Invalid age"),
 
+  Qualification: z.string(),
+
   gender: z.enum(GenderEnum, {
     errorMap: () => ({ message: "Gender must be male, female, or other" })
   }),

@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     enum: ['male', 'female', 'other']
   },
+  Qualification: {
+    type: String,
+    required: true,
+  },
   skinType: {
     type: String,
     required: true,
