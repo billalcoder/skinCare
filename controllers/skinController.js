@@ -165,7 +165,7 @@ Always personalize the advice based on the user data.`;
         aiRawResponse = {
           analysis: aiRawResponse,
           ingredients: [],
-          rating: 0,
+          rating: 1,
           suitability: 'moderate'
         };
       }
@@ -181,7 +181,7 @@ Always personalize the advice based on the user data.`;
         ingredients: aiRawResponse.ingredients || [],
         productType: aiRawResponse.productType || "Unknown",
         brand: aiRawResponse.brand || "Unknown",
-        rating: aiRawResponse.rating || 0,
+        rating: aiRawResponse.rating || 1,
         suitability: aiRawResponse.suitability || "moderate"
       }
     });
