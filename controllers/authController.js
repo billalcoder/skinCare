@@ -16,7 +16,7 @@ export const register = async (req, res) => {
     const { data, error, success } = userRegistrationSchema.safeParse(req.body)
     if(!success) res.status(401).json({error })
 
-    const { name, email, age, gender, skinType, allergies, concerns } = data;
+    const { name, email, age, gender, skinType, allergies, concerns , Qualification } = data;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -24,23 +24,24 @@ export const register = async (req, res) => {
       return res.status(400).json({ error: 'User already exists with this email' });
     }
 
-    // Generate OTP
-    const otpCode = generateOTP();
-    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    // // Generate OTP
+    // const otpCode = generateOTP();
+    // const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
     // Create new user
     const user = new User({
       name,
       email,
       age,
+      Qualification,
       gender,
       skinType,
       allergies: allergies || [],
       concerns: concerns || [],
-      otp: {
-        code: otpCode,
-        expiresAt: otpExpires
-      }
+      // otp: {
+      //   code: otpCode,
+      //   expiresAt: otpExpires
+      // }
     });
 
     await user.save();
@@ -100,9 +101,9 @@ export const login = async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    if (!user.isVerified) {
-      return res.status(400).json({ error: 'Please verify your email first' });
-    }
+    // if (!user.isVerified) {
+    //   return res.status(400).json({ error: 'Please verify your email first' });
+    // }
 
     // Generate session token
     const token = jwt.sign(
