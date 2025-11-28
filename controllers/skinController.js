@@ -43,13 +43,13 @@ Remember: skincare also includes cosmetic products.
 
 🧑‍🤝‍🧑 User Data (input)
 
-Name: {name}
-Age: {age}
-Gender: {gender}
-Skin type: {skin_type}
-Skin concerns: {skin_concern}
-Allergies (optional): {allergy}
-User qualification / education level: {qualification}
+Name: ${user.name}
+Age: ${user.age}
+Gender: ${user.gender}
+Skin type: ${user.skinType}
+Skin concerns: ${user.concerns}
+Allergies (optional): ${user.allergies}
+User qualification / education level: ${user.Qualification}
 (Examples: “No formal education”, “12th Arts”, “BSc”, “IIT Bombay CSE”, etc.)
 
 
@@ -211,13 +211,13 @@ Remember: skincare also includes cosmetic products.
 
 🧑‍🤝‍🧑 User Data (input)
 
-Name: {name}
-Age: {age}
-Gender: {gender}
-Skin type: {skin_type}
-Skin concerns: {skin_concern}
-Allergies (optional): {allergy}
-User qualification / education level: {qualification}
+Name: ${name}
+Age: ${age}
+Gender: ${gender}
+Skin type: ${skin_type}
+Skin concerns: ${skin_concern}
+Allergies (optional): ${allergy}
+User qualification / education level: ${qualification}
 (Examples: “No formal education”, “12th Arts”, “BSc”, “IIT Bombay CSE”, etc.)
 
 
