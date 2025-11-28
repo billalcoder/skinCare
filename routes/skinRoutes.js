@@ -14,6 +14,6 @@ const upload = multer({
 });
 
 // Route: POST /api/analyze
-router.post('/analyze', authenticate, upload.single('image'), analyzeSkinText);
+router.post('/analyze', upload.single('image'), analyzeSkinText);
 
 export default router;

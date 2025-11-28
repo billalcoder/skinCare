@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Skin Analyze API</title>
+</head>
+<body>
+
+    <h1>Test Skin Analyze API (Multer Upload)</h1>
+
+    <form id="analyzeForm">
+        <!-- Token input -->
+        <label>Auth Token:</label><br>
+        <input type="text" id="token" placeholder="Enter Bearer Token" required style="width:300px;"><br><br>
+
+        <!-- File input -->
+        <label>Select Image:</label><br>
+        <input type="file" id="image" accept="image/*" required><br><br>
+
+        <button type="submit">Send Request</button>
+    </form>
+
+    <h2>Response:</h2>
+    <pre id="responseBox" style="background:#f4f4f4; padding:10px;"></pre>
+
+    <script>
+        document.getElementById("analyzeForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const token = document.getElementById("token").value;
+            const file = document.getElementById("image").files[0];
+
+            if (!file) {
+                alert("Please select an image file.");
+                return;
+            }
+
+            // Create FormData for file upload
+            const formData = new FormData();
+            formData.append("image", file);
+
+            try {
+                const res = await fetch("http://localhost:5000/api/skin/analyze", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer " + token
+                    },
+                    body: formData
+                });
+
+                const data = await res.json();
+                document.getElementById("responseBox").textContent = JSON.stringify(data, null, 2);
+            } catch (err) {
+                document.getElementById("responseBox").textContent = "Error: " + err.message;
+            }
+        });
+    </script>
+
+</body>
+</html>
