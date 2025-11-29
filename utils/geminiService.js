@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-const genAI = new GoogleGenerativeAI("AIzaSyAyWAIovJ9Ro0MGmZRKZY1V2JTWeERc5vM");
+const genAI = new GoogleGenerativeAI("AIzaSyCuhkLD-3CDjp_j7TX_5Dw3Oah2sJa9d2Y");
 
 console.log(await genAI.listModel);
 

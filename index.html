@@ -2,45 +2,171 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Test Skin Analyze API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Backend Test Suite</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        .section { border: 1px solid #ddd; padding: 20px; margin-bottom: 20px; border-radius: 8px; background: #f9f9f9; }
+        h2 { margin-top: 0; color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
+        button { margin-top: 15px; padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; border-radius: 4px; }
+        button:hover { background: #0056b3; }
+        pre { background: #333; color: #0f0; padding: 10px; overflow-x: auto; border-radius: 4px; }
+        .status { margin-top: 10px; font-weight: bold; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
 </head>
 <body>
 
-    <h1>Test Skin Analyze API (Multer Upload)</h1>
+    <h1>Backend API Test Dashboard</h1>
 
-    <form id="analyzeForm">
-        <!-- Token input -->
-        <label>Auth Token:</label><br>
-        <input type="text" id="token" placeholder="Enter Bearer Token" required style="width:300px;"><br><br>
+    <div class="section">
+        <h2>1. Register</h2>
+        <form id="registerForm">
+            <label>Name:</label>
+            <input type="text" id="regName" placeholder="John Doe" required>
+            
+            <label>Email:</label>
+            <input type="email" id="regEmail" placeholder="test@example.com" required>
+            
+            <label>Password:</label>
+            <input type="password" id="regPass" placeholder="******" required>
+            
+            <button type="submit">Register</button>
+        </form>
+        <div id="regStatus" class="status"></div>
+    </div>
 
-        <!-- File input -->
-        <label>Select Image:</label><br>
-        <input type="file" id="image" accept="image/*" required><br><br>
+    <div class="section">
+        <h2>2. Login</h2>
+        <form id="loginForm">
+            <label>Email:</label>
+            <input type="email" id="loginEmail" placeholder="test@example.com" required>
+            
+            <label>Password:</label>
+            <input type="password" id="loginPass" placeholder="******" required>
+            
+            <button type="submit">Login</button>
+        </form>
+        <div id="loginStatus" class="status"></div>
+    </div>
 
-        <button type="submit">Send Request</button>
-    </form>
+    <div class="section" style="border-color: #007bff; background: #eef7ff;">
+        <h2>3. Analyze Skin (AWS Textract)</h2>
+        <p><i>Token will auto-fill after login/register.</i></p>
+        
+        <form id="analyzeForm">
+            <label>Auth Token (Bearer):</label>
+            <input type="text" id="token" placeholder="Login to auto-fill..." required>
 
-    <h2>Response:</h2>
-    <pre id="responseBox" style="background:#f4f4f4; padding:10px;"></pre>
+            <label>Select Image Product:</label>
+            <input type="file" id="image" accept="image/*" required>
+
+            <button type="submit">Upload & Analyze</button>
+        </form>
+
+        <h3>API Response:</h3>
+        <pre id="responseBox">Waiting for request...</pre>
+    </div>
 
     <script>
+        // --- CONFIGURATION ---
+        const BASE_URL = "http://localhost:5000/api"; 
+        
+        // Helper to set token across the UI
+        function setToken(token) {
+            document.getElementById("token").value = token;
+            // Optional: Save to localStorage so it persists on refresh
+            localStorage.setItem("authToken", token); 
+        }
+
+        // Check for saved token on load
+        window.onload = () => {
+            const savedToken = localStorage.getItem("authToken");
+            if (savedToken) document.getElementById("token").value = savedToken;
+        };
+
+        // --- 1. HANDLE REGISTER ---
+        document.getElementById("registerForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const name = document.getElementById("regName").value;
+            const email = document.getElementById("regEmail").value;
+            const password = document.getElementById("regPass").value;
+            const statusDiv = document.getElementById("regStatus");
+
+            try {
+                const res = await fetch(`${BASE_URL}/auth/register`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, email, password })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    statusDiv.innerHTML = `<span class="success">Success! Token received.</span>`;
+                    // Assuming your API returns { token: "..." } or { data: { token: "..." } }
+                    // Adjust 'data.token' based on your exact response structure
+                    if(data.token) setToken(data.token);
+                } else {
+                    statusDiv.innerHTML = `<span class="error">Error: ${data.message || data.error}</span>`;
+                }
+            } catch (err) {
+                statusDiv.innerHTML = `<span class="error">Network Error: ${err.message}</span>`;
+            }
+        });
+
+        // --- 2. HANDLE LOGIN ---
+        document.getElementById("loginForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const email = document.getElementById("loginEmail").value;
+            const password = document.getElementById("loginPass").value;
+            const statusDiv = document.getElementById("loginStatus");
+
+            try {
+                const res = await fetch(`${BASE_URL}/auth/login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    statusDiv.innerHTML = `<span class="success">Login Successful! Token set below.</span>`;
+                    if(data.token) setToken(data.token);
+                } else {
+                    statusDiv.innerHTML = `<span class="error">Error: ${data.message || data.error}</span>`;
+                }
+            } catch (err) {
+                statusDiv.innerHTML = `<span class="error">Network Error: ${err.message}</span>`;
+            }
+        });
+
+        // --- 3. HANDLE ANALYZE ---
         document.getElementById("analyzeForm").addEventListener("submit", async function (e) {
             e.preventDefault();
 
             const token = document.getElementById("token").value;
             const file = document.getElementById("image").files[0];
+            const responseBox = document.getElementById("responseBox");
 
+            if (!token) {
+                alert("You need to Login or Register to get a token first!");
+                return;
+            }
             if (!file) {
                 alert("Please select an image file.");
                 return;
             }
 
-            // Create FormData for file upload
+            responseBox.textContent = "Processing image with AWS Textract...";
+
             const formData = new FormData();
             formData.append("image", file);
 
             try {
-                const res = await fetch("http://localhost:5000/api/skin/analyze", {
+                const res = await fetch(`${BASE_URL}/skin/analyze`, {
                     method: "POST",
                     headers: {
                         "Authorization": "Bearer " + token
@@ -49,9 +175,9 @@
                 });
 
                 const data = await res.json();
-                document.getElementById("responseBox").textContent = JSON.stringify(data, null, 2);
+                responseBox.textContent = JSON.stringify(data, null, 2);
             } catch (err) {
-                document.getElementById("responseBox").textContent = "Error: " + err.message;
+                responseBox.textContent = "Error: " + err.message;
             }
         });
     </script>

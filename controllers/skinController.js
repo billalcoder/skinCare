@@ -2,7 +2,41 @@ import History from '../models/History.js';
 import User from '../models/User.js';
 import { extractTextFromImage } from '../service/textremove.js';
 import { getGeminiResponse } from '../utils/geminiService.js';
+import { TextractClient, DetectDocumentTextCommand } from '@aws-sdk/client-textract';
 
+
+const textractClient = new TextractClient({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+})
+
+async function extractTextWithAWS(buffer) {
+  try {
+    const command = new DetectDocumentTextCommand({
+      Document: {
+        Bytes: buffer, // AWS accepts the raw buffer directly
+      },
+    });
+
+    const response = await textractClient.send(command);
+
+    console.log(response);
+
+    // AWS returns a list of "Blocks". We only want the lines of text.
+    if (!response.Blocks) return "";
+
+    return response.Blocks
+      .filter(block => block.BlockType === 'LINE') // Filter for lines (ignore individual words)
+      .map(block => block.Text)                    // Extract the text string
+      .join('\n');                                 // Join with newlines
+
+  } catch (error) {
+    console.error("AWS Textract Error:", error);
+    throw new Error("Failed to process image with AWS Textract");
+  }}
 // Process skin analysis
 export const analyzeSkinText = async (req, res) => {
   try {
@@ -13,7 +47,7 @@ export const analyzeSkinText = async (req, res) => {
     if (req.file) {
       console.log("Processing image with Tesseract.js...");
       // Tesseract accepts the buffer directly
-      extractedText = await extractTextFromImage(req.file.buffer);
+      extractedText = await extractTextWithAWS(req.file.buffer);
     }
     // 2. CHECK FOR RAW TEXT (FALLBACK)
     else if (req.body.extractedText) {
@@ -157,7 +191,7 @@ Always personalize the advice based on the user data.`;
     if (typeof aiRawResponse === 'string') {
       aiRawResponse = aiRawResponse.replace(/```json|```/g, '').trim();
       try {
-        aiRawResponse = JSON.parse(aiRawResponse);
+        aiRawResponse = aiRawResponse
       } catch (e) {
         console.error("JSON Parse Error:", e);
         // Fallback object to prevent crash

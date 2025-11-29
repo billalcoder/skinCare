@@ -14,11 +14,10 @@ const historySchema = new mongoose.Schema({
   },
   productAnalysis: {
     type: String,
-    required: true
+
   },
   aiResponse: {
     type: Object,
-    required: true
   },
   metadata: {
     ingredients: [String],
@@ -32,7 +31,6 @@ const historySchema = new mongoose.Schema({
     suitability: {
       type: String,
       enum: ['excellent', 'good', 'moderate', 'poor', 'unsuitable'],
-      required: true
     }
   },
   timestamp: {
