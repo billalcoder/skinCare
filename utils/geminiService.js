@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-const genAI = new GoogleGenerativeAI("AIzaSyCuhkLD-3CDjp_j7TX_5Dw3Oah2sJa9d2Y");
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 console.log(await genAI.listModel);
 
